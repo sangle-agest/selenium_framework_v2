@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Selenium Hub for running tests
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+      - "4442:4442" 
+      - "4443:4443"
+    environment:
+      GRID_MAX_SESSION: 16
+      GRID_BROWSER_TIMEOUT: 300
+      GRID_TIMEOUT: 300
+    networks:
+      - selenium-network
+    restart: unless-stopped
+
+  # Chrome Node for Selenium Grid
+  selenium-chrome:
+    image: selenium/node-chrome:4.15.0
+    depends_on:
+      - selenium-hub
+    environment:
+      HUB_HOST: selenium-hub
+      HUB_PORT: 4444
+      NODE_MAX_INSTANCES: 4
+      NODE_MAX_SESSION: 4
+    networks:
+      - selenium-network
+    volumes:
+      - /dev/shm:/dev/shm
+    restart: unless-stopped
+    scale: 2
+
+networks:
+  selenium-network:
+    driver: bridge

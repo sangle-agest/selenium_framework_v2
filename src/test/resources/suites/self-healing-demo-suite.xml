@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="SelfHealingDemoSuite" verbose="1" parallel="false">
+    <test name="SelfHealingDemo" preserve-order="true">
+        <classes>
+            <class name="com.myorg.tests.demo.SelfHealingDemoTest">
+                <!-- First run tests on original page to establish baseline -->
+                <methods>
+                    <include name="testOriginalPageFormSubmission"/>
+                    <include name="testOriginalPageNavigation"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <test name="SelfHealingSimulation" preserve-order="true">
+        <classes>
+            <class name="com.myorg.tests.demo.SelfHealingDemoTest">
+                <!-- Then run same tests on modified page to demonstrate self-healing -->
+                <methods>
+                    <include name="testModifiedPageFormSubmissionWithSelfHealing"/>
+                    <include name="testModifiedPageNavigationWithSelfHealing"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

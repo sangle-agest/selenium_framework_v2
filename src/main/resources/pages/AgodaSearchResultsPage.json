@@ -1,0 +1,127 @@
+{
+  "pageName": "AgodaSearchResultsPage",
+  "url": "https://www.agoda.com/search",
+  "description": "Agoda search results page with hotels listing and filters",
+  "elements": [
+    {
+      "name": "searchResultsContainer",
+      "locator": "xpath=//div[@data-selenium='hotel-list']",
+      "type": "Container",
+      "description": "Main search results container"
+    },
+    {
+      "name": "sortDropdown",
+      "locator": "xpath=//select[@data-selenium='sort-dropdown']",
+      "type": "Dropdown",
+      "description": "Sort options dropdown"
+    },
+    {
+      "name": "sortByPriceLowHigh",
+      "locator": "xpath=//option[@data-selenium='sort-price-asc']",
+      "type": "Option",
+      "description": "Sort by price low to high option"
+    },
+    {
+      "name": "sortByPriceHighLow",
+      "locator": "xpath=//option[@data-selenium='sort-price-desc']",
+      "type": "Option",
+      "description": "Sort by price high to low option"
+    },
+    {
+      "name": "sortByRating",
+      "locator": "xpath=//option[@data-selenium='sort-rating']",
+      "type": "Option",
+      "description": "Sort by rating option"
+    },
+    {
+      "name": "hotelItem",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][{index}]",
+      "type": "Container",
+      "description": "Individual hotel item container (dynamic index)"
+    },
+    {
+      "name": "hotelName",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][{index}]//h3[@class='hotel-name']",
+      "type": "Text",
+      "description": "Hotel name (dynamic index)"
+    },
+    {
+      "name": "hotelPrice",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][{index}]//span[@class='hotel-price']",
+      "type": "Text",
+      "description": "Hotel price (dynamic index)"
+    },
+    {
+      "name": "hotelRating",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][{index}]//span[@class='hotel-rating']",
+      "type": "Text",
+      "description": "Hotel rating (dynamic index)"
+    },
+    {
+      "name": "firstHotel",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][1]",
+      "type": "Container",
+      "description": "First hotel in search results"
+    },
+    {
+      "name": "firstHotelName",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][1]//h3[@class='hotel-name']",
+      "type": "Text",
+      "description": "First hotel name"
+    },
+    {
+      "name": "firstHotelPrice",
+      "locator": "xpath=//div[@data-selenium='hotel-item'][1]//span[@class='hotel-price']",
+      "type": "Text",
+      "description": "First hotel price"
+    },
+    {
+      "name": "priceFilterMin",
+      "locator": "xpath=//input[@data-selenium='price-filter-min']",
+      "type": "Textbox",
+      "description": "Minimum price filter input"
+    },
+    {
+      "name": "priceFilterMax",
+      "locator": "xpath=//input[@data-selenium='price-filter-max']",
+      "type": "Textbox",
+      "description": "Maximum price filter input"
+    },
+    {
+      "name": "priceFilterApply",
+      "locator": "xpath=//button[@data-selenium='price-filter-apply']",
+      "type": "Button",
+      "description": "Apply price filter button"
+    },
+    {
+      "name": "starRating5",
+      "locator": "xpath=//input[@data-selenium='filter-star-5']",
+      "type": "Checkbox",
+      "description": "5-star rating filter"
+    },
+    {
+      "name": "starRating4",
+      "locator": "xpath=//input[@data-selenium='filter-star-4']",
+      "type": "Checkbox",
+      "description": "4-star rating filter"
+    },
+    {
+      "name": "wifiFilter",
+      "locator": "xpath=//input[@data-selenium='filter-wifi']",
+      "type": "Checkbox",
+      "description": "WiFi facility filter"
+    },
+    {
+      "name": "poolFilter",
+      "locator": "xpath=//input[@data-selenium='filter-pool']",
+      "type": "Checkbox",
+      "description": "Pool facility filter"
+    },
+    {
+      "name": "totalResultsCount",
+      "locator": "xpath=//span[@data-selenium='results-count']",
+      "type": "Text",
+      "description": "Total number of search results"
+    }
+  ]
+}

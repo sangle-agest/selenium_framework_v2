@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="AutomationTestSuite" parallel="methods" thread-count="3" verbose="1">
+    
+    <parameter name="browser" value="chrome"/>
+    <parameter name="headless" value="false"/>
+    <parameter name="timeout" value="10000"/>
+    <parameter name="baseUrl" value="https://www.agoda.com"/>
+    
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+    
+    <!-- Self-Healing Demo Test -->
+    <test name="SelfHealingDemo" preserve-order="true">
+        <classes>
+            <class name="com.myorg.tests.demo.SelfHealingDemoTest"/>
+        </classes>
+    </test>
+    
+    <!-- Smoke Test Group -->
+    <test name="SmokeTests" preserve-order="true">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.myorg.tests.AgodaSearchTest"/>
+        </classes>
+    </test>
+    
+    <!-- Regression Test Group -->
+    <test name="RegressionTests" preserve-order="true">
+        <groups>
+            <run>
+                <include name="regression"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.myorg.tests.AgodaSearchTest"/>
+        </classes>
+    </test>
+    
+    <!-- All Tests -->
+    <test name="AllTests" preserve-order="true">
+        <classes>
+            <class name="com.myorg.tests.AgodaSearchTest"/>
+        </classes>
+    </test>
+    
+</suite>

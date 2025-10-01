@@ -1,0 +1,67 @@
+{
+  "test_user_data": {
+    "validEmail": "test.user@example.com",
+    "validPassword": "TestPassword123!",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phoneNumber": "+1234567890",
+    "country": "United States",
+    "city": "New York",
+    "address": "123 Test Street",
+    "zipCode": "10001"
+  },
+  "invalid_user_data": {
+    "invalidEmail": "invalid-email-format",
+    "invalidPassword": "123",
+    "emptyEmail": "",
+    "emptyPassword": "",
+    "tooLongEmail": "verylongemailaddressthatexceedsmaximumlength@verylongdomainnamethatisnotvalid.com",
+    "specialCharPassword": "!@#$%^&*()"
+  },
+  "browser_config": {
+    "defaultBrowser": "chrome",
+    "headless": false,
+    "timeout": 10000,
+    "pageLoadTimeout": 30000,
+    "implicitWait": 5000,
+    "windowWidth": 1920,
+    "windowHeight": 1080,
+    "downloadDirectory": "./downloads"
+  },
+  "environment_config": {
+    "baseUrl": "https://www.agoda.com",
+    "apiBaseUrl": "https://api.agoda.com",
+    "environment": "test",
+    "locale": "en-US",
+    "currency": "USD",
+    "timezone": "UTC",
+    "retryAttempts": 3,
+    "retryDelay": 2000
+  },
+  "test_data_sets": {
+    "currencies": ["USD", "EUR", "GBP", "JPY", "SGD", "THB", "VND"],
+    "languages": ["en", "th", "vi", "ja", "ko", "zh", "de", "fr"],
+    "countries": ["United States", "Thailand", "Vietnam", "Japan", "Singapore", "United Kingdom"],
+    "popularDestinations": ["Bangkok", "Phuket", "Da Nang", "Ho Chi Minh City", "Hanoi", "Nha Trang"],
+    "roomTypes": ["Standard Room", "Deluxe Room", "Suite", "Villa", "Apartment"],
+    "amenities": ["WiFi", "Pool", "Gym", "Spa", "Restaurant", "Bar", "Parking"]
+  },
+  "date_scenarios": {
+    "sameDay": {
+      "checkIn": "<TODAY>",
+      "checkOut": "<TOMORROW>"
+    },
+    "nextWeek": {
+      "checkIn": "<NEXT_MONDAY>",
+      "checkOut": "<NEXT_FRIDAY>"
+    },
+    "nextMonth": {
+      "checkIn": "<PLUS_1_MONTHS>",
+      "checkOut": "<PLUS_32_DAYS>"
+    },
+    "longStay": {
+      "checkIn": "<PLUS_2_WEEKS>",
+      "checkOut": "<PLUS_6_WEEKS>"
+    }
+  }
+}

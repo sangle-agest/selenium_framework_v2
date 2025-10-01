@@ -1,0 +1,4 @@
+com/myorg/tests/BaseTest.class
+com/myorg/tests/demo/SelfHealingDemoTest.class
+com/myorg/tests/healenium/HealeniumDemoTest.class
+com/myorg/tests/AgodaSearchTest.class

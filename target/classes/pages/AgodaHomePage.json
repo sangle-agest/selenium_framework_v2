@@ -1,0 +1,79 @@
+{
+  "pageName": "AgodaHomePage",
+  "url": "https://www.agoda.com/",
+  "description": "Agoda main homepage with search functionality",
+  "elements": [
+    {
+      "name": "searchBox",
+      "locator": "xpath=//input[@data-selenium='textInput']",
+      "type": "Textbox",
+      "description": "Main search input field for destination"
+    },
+    {
+      "name": "searchButton",
+      "locator": "xpath=//button[@data-selenium='searchButton']",
+      "type": "Button",
+      "description": "Main search button"
+    },
+    {
+      "name": "checkInDatePicker",
+      "locator": "xpath=//div[@data-selenium='checkInBox']",
+      "type": "Button",
+      "description": "Check-in date picker"
+    },
+    {
+      "name": "checkOutDatePicker",
+      "locator": "xpath=//div[@data-selenium='checkOutBox']",
+      "type": "Button",
+      "description": "Check-out date picker"
+    },
+    {
+      "name": "guestsAndRoomsSelector",
+      "locator": "xpath=//div[@data-selenium='occupancyBox']",
+      "type": "Button",
+      "description": "Guests and rooms selector dropdown"
+    },
+    {
+      "name": "adultsCount",
+      "locator": "xpath=//input[@data-selenium='adultsInput']",
+      "type": "Textbox",
+      "description": "Number of adults input"
+    },
+    {
+      "name": "roomsCount",
+      "locator": "xpath=//input[@data-selenium='roomsInput']",
+      "type": "Textbox",
+      "description": "Number of rooms input"
+    },
+    {
+      "name": "applyButton",
+      "locator": "xpath=//button[@data-selenium='occupancyApplyBtn']",
+      "type": "Button",
+      "description": "Apply occupancy settings button"
+    },
+    {
+      "name": "destinationSuggestions",
+      "locator": "xpath=//ul[@data-selenium='autocomplete-list']",
+      "type": "List",
+      "description": "Destination autocomplete suggestions list"
+    },
+    {
+      "name": "firstDestinationSuggestion",
+      "locator": "xpath=//ul[@data-selenium='autocomplete-list']//li[1]",
+      "type": "Button",
+      "description": "First destination suggestion"
+    },
+    {
+      "name": "adultPlusButton",
+      "locator": "xpath=//button[@data-selenium='adult-plus-btn']",
+      "type": "Button",
+      "description": "Increase adult count button"
+    },
+    {
+      "name": "roomPlusButton",
+      "locator": "xpath=//button[@data-selenium='room-plus-btn']",
+      "type": "Button",
+      "description": "Increase room count button"
+    }
+  ]
+}
