@@ -2,6 +2,7 @@ package com.myorg.tests;
 
 import com.myorg.automation.pages.agoda.AgodaHomePage;
 import com.myorg.automation.pages.agoda.AgodaSearchResultsPage;
+import com.myorg.automation.enums.SortType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.*;
@@ -44,37 +45,50 @@ public class AgodaSearchTest extends BaseTest {
         logger.info("Starting TC01: Search and Sort Hotel Successfully");
         
         // Step 1: Navigate to https://www.agoda.com/
-        step1_navigateToHomepage();
+        navigateToHomepage();
         
-        // Step 2: Search hotel with Da Nang, 3 days from next Friday, 2 rooms, 4 adults
-        AgodaSearchResultsPage searchResults = step2_searchHotel();
+        // Step 2: Verify Agoda homepage is displayed
+        verifyHomepageIsDisplayed();
         
-        // Step 3: Verify search result is displayed
-        step3_verifySearchResults(searchResults);
+        // Step 3: Search hotel with Da Nang, 3 days from next Friday, 2 rooms, 4 adults
+        AgodaSearchResultsPage searchResults = searchHotel();
         
-        // Step 4: Sort hotels by lowest prices
-        step4_sortHotelsByLowestPrice(searchResults);
+        // Step 4: Verify search results are displayed
+        verifySearchResults(searchResults);
+        
+        // Step 5: Sort hotels by lowest prices
+        sortHotelsByLowestPrice(searchResults);
+        
+        // Step 6: Verify hotels are sorted correctly
+        verifySortedResults(searchResults);
         
         logger.info("TC01 completed successfully");
     }
 
-    @Step("Step 1: Navigate to Agoda homepage")
-    private void step1_navigateToHomepage() {
-        logger.info("Step 1: Navigate to https://www.agoda.com/");
+    @Step("Navigate to Agoda homepage")
+    private void navigateToHomepage() {
+        logger.info("Navigate to https://www.agoda.com/");
         
         // Navigate to Agoda homepage
         open(homePage.getPageUrl());
+        
+        logger.info("Navigation completed");
+    }
+    
+    @Step("Verify Agoda homepage is displayed")
+    private void verifyHomepageIsDisplayed() {
+        logger.info("Verify Agoda homepage is displayed");
         
         // Expected: Agoda homepage is displayed
         Assert.assertTrue(homePage.isElementVisible("search_box_container"), 
                 "Agoda homepage should be displayed with search box");
         
-        logger.info("Step 1 completed - Agoda homepage is displayed");
+        logger.info("Agoda homepage is displayed");
     }
 
-    @Step("Step 2: Search hotel with specified criteria")
-    private AgodaSearchResultsPage step2_searchHotel() {
-        logger.info("Step 2: Search hotel with Da Nang, family travelers configuration");
+    @Step("Search hotel with specified criteria")
+    private AgodaSearchResultsPage searchHotel() {
+        logger.info("Search hotel with Da Nang, family travelers configuration");
         
         JsonNode searchCriteria = testData.get("searchCriteria");
         String destination = searchCriteria.get("destination").asText();
@@ -112,18 +126,18 @@ public class AgodaSearchTest extends BaseTest {
         Assert.assertTrue(currentUrl.contains("adults=4") || currentUrl.contains("adults=3"), 
                 "URL should contain adults parameter");
         
-        logger.info("Step 2 completed - Search executed and results page opened");
+        logger.info("Search executed and results page opened");
         return new AgodaSearchResultsPage();
     }
 
-    @Step("Step 3: Verify search results are displayed")
-    private void step3_verifySearchResults(AgodaSearchResultsPage searchResults) {
-        logger.info("Step 3: Verify search result is displayed");
+    @Step("Verify search results are displayed")
+    private void verifySearchResults(AgodaSearchResultsPage searchResults) {
+        logger.info("Verify search result is displayed");
         
         // Wait for results to load
         searchResults.waitForResultsToLoad();
         
-        // Expected: First 5 hotels listed correctly with Da Nang as destination
+        // Expected: Search results are displayed
         Assert.assertTrue(searchResults.areResultsLoaded(), 
                 "Search results should be displayed");
         
@@ -145,30 +159,27 @@ public class AgodaSearchTest extends BaseTest {
             }
         }
         
-        logger.info("Step 3 completed - First {} hotels verified successfully", expectedHotelCount);
+        logger.info("First {} hotels verified successfully", expectedHotelCount);
     }
 
-    @Step("Step 4: Sort hotels by lowest prices")
-    private void step4_sortHotelsByLowestPrice(AgodaSearchResultsPage searchResults) {
-        logger.info("Step 4: Sort hotels by lowest prices");
+    @Step("Sort hotels by lowest prices")
+    private void sortHotelsByLowestPrice(AgodaSearchResultsPage searchResults) {
+        logger.info("Sort hotels by lowest prices");
         
-        // Get prices before sorting for comparison
-        String[] pricesBeforeSorting = new String[5];
-        for (int i = 0; i < 5; i++) {
-            try {
-                pricesBeforeSorting[i] = searchResults.getHotelPrice(i);
-            } catch (Exception e) {
-                logger.warn("Could not get price for hotel {}: {}", (i + 1), e.getMessage());
-            }
-        }
-        
-        // Sort by lowest prices
-        searchResults.sortBy("price_low_high");
+        // Sort by lowest prices using enum
+        searchResults.sortBy(SortType.PRICE_LOW_TO_HIGH);
         
         // Wait for sorting to complete
         sleep(3000);
         
-        // Expected: First 5 hotels re-ordered by ascending price, still showing Da Nang
+        logger.info("Sorting action completed");
+    }
+    
+    @Step("Verify hotels are sorted correctly")
+    private void verifySortedResults(AgodaSearchResultsPage searchResults) {
+        logger.info("Verify hotels are sorted correctly");
+        
+        // Expected: Hotels re-ordered by ascending price, still showing Da Nang
         // Verify hotels are still displayed after sorting
         Assert.assertTrue(searchResults.areResultsLoaded(), 
                 "Search results should still be displayed after sorting");
@@ -190,7 +201,7 @@ public class AgodaSearchTest extends BaseTest {
             }
         }
         
-        logger.info("Step 4 completed - Hotels sorted by lowest prices successfully");
+        logger.info("Hotels sorted by lowest prices successfully verified");
     }
 
     /**

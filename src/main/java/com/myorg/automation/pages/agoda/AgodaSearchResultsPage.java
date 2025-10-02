@@ -1,6 +1,7 @@
 package com.myorg.automation.pages.agoda;
 
 import com.myorg.automation.pages.BasePage;
+import com.myorg.automation.enums.SortType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +60,43 @@ public class AgodaSearchResultsPage extends BasePage {
     }
     
     /**
-     * Sort results by option
-     * @param sortOption The sort option (price_low_high, price_high_low, rating, etc.)
+     * Sort results by option using enum
+     * @param sortType The sort type from SortType enum
      * @return AgodaSearchResultsPage instance for method chaining
      */
+    public AgodaSearchResultsPage sortBy(SortType sortType) {
+        logger.info("Sorting by: {}", sortType.getDisplayName());
+        clickElement("sortDropdown");
+        
+        // Map sort types to element names
+        String sortElementName;
+        switch (sortType) {
+            case PRICE_LOW_TO_HIGH:
+                sortElementName = "sortByPriceLowHigh";
+                break;
+            case PRICE_HIGH_TO_LOW:
+                sortElementName = "sortByPriceHighLow";
+                break;
+            case RATING_HIGH_TO_LOW:
+                sortElementName = "sortByRating";
+                break;
+            default:
+                sortElementName = "sortByPriceLowHigh";
+        }
+        
+        clickElement(sortElementName);
+        return this;
+    }
+    
+    /**
+     * Sort results by option using string (deprecated - use SortType enum instead)
+     * @param sortOption The sort option string
+     * @return AgodaSearchResultsPage instance for method chaining
+     * @deprecated Use {@link #sortBy(SortType)} instead
+     */
+    @Deprecated
     public AgodaSearchResultsPage sortBy(String sortOption) {
-        logger.info("Sorting by: {}", sortOption);
+        logger.info("Sorting by: {} (using deprecated string method)", sortOption);
         clickElement("sortDropdown");
         
         // Map sort options to element names
