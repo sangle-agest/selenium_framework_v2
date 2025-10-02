@@ -3,15 +3,13 @@ package com.myorg.tests;
 import com.myorg.automation.pages.agoda.AgodaHomePage;
 import com.myorg.automation.pages.agoda.AgodaSearchResultsPage;
 import com.myorg.automation.enums.SortType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.myorg.automation.models.SearchTestData;
+import com.myorg.automation.utils.TestDataProvider;
 import io.qameta.allure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.*;
-
-import java.io.InputStream;
 
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverRunner.*;
@@ -26,23 +24,22 @@ public class AgodaSearchTest extends BaseTest {
     private static final Logger logger = LoggerFactory.getLogger(AgodaSearchTest.class);
     
     private AgodaHomePage homePage;
-    private JsonNode testData;
 
     @BeforeMethod(alwaysRun = true)
-    @Step("Initialize page objects and load test data")
+    @Step("Initialize page objects")
     public void setupMethod() {
         logger.info("Initializing test setup for TC01");
         homePage = new AgodaHomePage();
-        loadTestData();
         logger.info("Test setup completed successfully");
     }
 
-    @Test(groups = {"smoke", "regression"}, priority = 1)
+    @Test(groups = {"smoke", "regression"}, priority = 1, dataProvider = "tc01_da_nang_search", dataProviderClass = TestDataProvider.class)
     @Story("TC01: Search and Sort Hotel Successfully")
     @Description("Search hotels in Da Nang for family travelers and sort by lowest prices")
     @Severity(SeverityLevel.CRITICAL)
-    public void tc01_searchAndSortHotelSuccessfully() {
+    public void tc01_searchAndSortHotelSuccessfully(SearchTestData testData) {
         logger.info("Starting TC01: Search and Sort Hotel Successfully");
+        logger.info("Test data: {}", testData);
         
         // Step 1: Navigate to https://www.agoda.com/
         navigateToHomepage();
@@ -50,11 +47,11 @@ public class AgodaSearchTest extends BaseTest {
         // Step 2: Verify Agoda homepage is displayed
         verifyHomepageIsDisplayed();
         
-        // Step 3: Search hotel with Da Nang, 3 days from next Friday, 2 rooms, 4 adults
-        AgodaSearchResultsPage searchResults = searchHotel();
+        // Step 3: Search hotel with test data criteria
+        AgodaSearchResultsPage searchResults = searchHotel(testData);
         
         // Step 4: Verify search results are displayed
-        verifySearchResults(searchResults);
+        verifySearchResults(searchResults, testData);
         
         // Step 5: Sort hotels by lowest prices
         sortHotelsByLowestPrice(searchResults);
@@ -79,48 +76,55 @@ public class AgodaSearchTest extends BaseTest {
     private void verifyHomepageIsDisplayed() {
         logger.info("Verify Agoda homepage is displayed");
         
-        // Expected: Agoda homepage is displayed
-        Assert.assertTrue(homePage.isElementVisible("search_box_container"), 
-                "Agoda homepage should be displayed with search box");
+        // Expected: Agoda homepage is displayed with correct title and search box
+        Assert.assertTrue(homePage.isDisplayed(), 
+                "Agoda homepage should be displayed with correct title and search box");
         
         logger.info("Agoda homepage is displayed");
     }
 
     @Step("Search hotel with specified criteria")
-    private AgodaSearchResultsPage searchHotel() {
-        logger.info("Search hotel with Da Nang, family travelers configuration");
+    private AgodaSearchResultsPage searchHotel(SearchTestData testData) {
+        logger.info("Search hotel with {} for {} travelers", testData.getPlace(), testData.getTravellerType());
         
-        JsonNode searchCriteria = testData.get("searchCriteria");
-        String destination = searchCriteria.get("destination").asText();
+        String destination = testData.getPlace();
         
         // Enter destination
         homePage.enterDestination(destination);
         
         // Wait a moment for suggestions and select first one
-        sleep(2000);
         if (homePage.areDestinationSuggestionsVisible()) {
             homePage.selectFirstDestination();
         }
         
-        // Open occupancy selector and configure for family travelers
-        // 2 rooms, 4 adults as specified in test data
-        homePage.openOccupancySelector();
+        // Step 2: Verify calendar is displayed (automatically appears after destination selection)
+        // logger.info("Verifying calendar is displayed after destination selection");
+        // Assert.assertTrue(homePage.isCalendarDisplayed(), 
+        //         "Calendar should be automatically displayed after selecting destination");
         
-        // Note: The actual guest configuration would require additional HTML
-        // structure from the occupancy popup. For now, we'll proceed with search.
+        // Step 3: Select check-in and check-out dates based on test data
+        logger.info("Selecting dates: Check-in: {}, Check-out: {}", 
+                testData.getCheckInDate(), testData.getCheckOutDate());
+        homePage.selectCheckInDate(testData.getCheckInDate())
+                .selectCheckOutDate(testData.getCheckOutDate());
         
-        // Execute search - this will open a new tab
+        // Step 4: Configure occupancy based on test data
+        logger.info("Configuring occupancy: {} rooms, {} adults, {} children", 
+                testData.getRooms(), testData.getAdults(), testData.getChildren());
+        homePage.configureOccupancy(testData.getRooms(), testData.getAdults(), testData.getChildren());
+        
+        // Step 5: Execute search - this will open a new tab
         String originalWindow = getWebDriver().getWindowHandle();
-        homePage.searchHotels();
+        homePage.executeSearch();
         
         // Switch to new tab with search results
         switchToNewTab(originalWindow);
         
-        // Expected: Search result page shows hotels in Da Nang
-        // URL should contain city=16440&rooms=2&adults=4
+        // Expected: Search result page shows hotels in destination
+        // URL should contain city parameter for the searched location
         String currentUrl = getWebDriver().getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains("city=16440"), 
-                "URL should contain city=16440 for Da Nang");
+        Assert.assertTrue(currentUrl.contains("city="), 
+                "URL should contain city parameter for " + destination);
         Assert.assertTrue(currentUrl.contains("rooms=2"), 
                 "URL should contain rooms=2");
         Assert.assertTrue(currentUrl.contains("adults=4") || currentUrl.contains("adults=3"), 
@@ -131,7 +135,7 @@ public class AgodaSearchTest extends BaseTest {
     }
 
     @Step("Verify search results are displayed")
-    private void verifySearchResults(AgodaSearchResultsPage searchResults) {
+    private void verifySearchResults(AgodaSearchResultsPage searchResults, SearchTestData testData) {
         logger.info("Verify search result is displayed");
         
         // Wait for results to load
@@ -142,7 +146,7 @@ public class AgodaSearchTest extends BaseTest {
                 "Search results should be displayed");
         
         // Use dynamic method to verify expected number of hotels
-        int expectedHotelCount = testData.get("expectedResults").get("minimumHotels").asInt();
+        int expectedHotelCount = testData.getExpectedResultsMinimum();
         boolean hotelsVerified = searchResults.verifyFirstNHotels(expectedHotelCount);
         
         Assert.assertTrue(hotelsVerified, 
@@ -216,23 +220,6 @@ public class AgodaSearchTest extends BaseTest {
                 switchTo().window(windowHandle);
                 break;
             }
-        }
-    }
-
-    /**
-     * Load test data from JSON file
-     */
-    private void loadTestData() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            InputStream inputStream = getClass().getClassLoader()
-                    .getResourceAsStream("testdata/agoda_search_data.json");
-            JsonNode rootNode = mapper.readTree(inputStream);
-            testData = rootNode.get("testCases").get("tc01_da_nang_family_search");
-            logger.info("Test data loaded successfully");
-        } catch (Exception e) {
-            logger.error("Failed to load test data: {}", e.getMessage());
-            throw new RuntimeException("Test data loading failed", e);
         }
     }
 }

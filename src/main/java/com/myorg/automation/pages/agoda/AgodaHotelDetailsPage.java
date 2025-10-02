@@ -44,16 +44,6 @@ public class AgodaHotelDetailsPage extends BasePage {
     }
     
     /**
-     * Proceed to booking
-     * @return AgodaBookingPage instance
-     */
-    public AgodaBookingPage proceedToBooking() {
-        logger.info("Proceeding to booking");
-        clickElement("book_now_button");
-        return new AgodaBookingPage();
-    }
-    
-    /**
      * View hotel photos
      * @return AgodaHotelDetailsPage instance for method chaining
      */

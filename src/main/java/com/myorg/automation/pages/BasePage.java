@@ -123,16 +123,29 @@ public abstract class BasePage {
     }
     
     /**
-     * Click element with smart waiting
+     * Click element with smart waiting and retry logic
      * @param elementName The element name from JSON
      * @return Current page instance for method chaining
      */
     protected BasePage clickElement(String elementName) {
-        SelenideElement element = getElement(elementName);
         String description = JsonLocatorHelper.getElementDescription(pageName, elementName);
-        
         logger.info("Clicking element: {}", description);
-        element.click();
+        
+        boolean success = retryOperation(() -> {
+            try {
+                SelenideElement element = getElement(elementName);
+                element.click();
+                logger.debug("Successfully clicked element: {}", description);
+                return true;
+            } catch (Exception e) {
+                logger.debug("Failed to click element '{}': {}", description, e.getMessage());
+                return false;
+            }
+        });
+        
+        if (!success) {
+            throw new RuntimeException("Failed to click element '" + elementName + "' after 3 attempts");
+        }
         
         return this;
     }
@@ -155,6 +168,59 @@ public abstract class BasePage {
         logger.info("Typing text '{}' into element: {}", text, description);
         element.clear();
         element.setValue(text);
+        
+        return this;
+    }
+    
+    /**
+     * Click element first and then type text - Special case for search boxes that need activation
+     * @param elementName The element name from JSON
+     * @param text The text to type
+     * @return Current page instance for method chaining
+     */
+    protected BasePage clickAndEnter(String elementName, String text) {
+        if (text == null || text.trim().isEmpty()) {
+            logger.warn("Empty text provided for element: {}", elementName);
+            return this;
+        }
+        
+        SelenideElement element = getElement(elementName);
+        String description = JsonLocatorHelper.getElementDescription(pageName, elementName);
+        
+        logger.info("Clicking and entering text '{}' into element: {}", text, description);
+        
+        // First click to activate the element (important for search boxes)
+        element.click();
+        
+        // Small wait to ensure the element is activated
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // Clear any existing content first
+        element.clear();
+        
+        // Type character by character to trigger autocomplete properly
+        for (int i = 0; i < text.length(); i++) {
+            String character = String.valueOf(text.charAt(i));
+            element.sendKeys(character);
+            
+            // Small delay between characters to trigger search events
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        
+        // Wait a bit more for suggestions to appear after complete text
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         
         return this;
     }
@@ -196,18 +262,33 @@ public abstract class BasePage {
     }
     
     /**
-     * Get text from element
+     * Get text from element with retry logic
      * @param elementName The element name from JSON
      * @return The element text
      */
     public String getElementText(String elementName) {
-        SelenideElement element = getElement(elementName);
         String description = JsonLocatorHelper.getElementDescription(pageName, elementName);
+        logger.debug("Getting text from element: {}", description);
         
-        String text = element.getText();
-        logger.debug("Retrieved text '{}' from element: {}", text, description);
+        final String[] result = {null};
+        boolean success = retryOperation(() -> {
+            try {
+                SelenideElement element = getElement(elementName);
+                result[0] = element.getText();
+                logger.debug("Retrieved text '{}' from element: {}", result[0], description);
+                return true;
+            } catch (Exception e) {
+                logger.debug("Failed to get text from element '{}': {}", description, e.getMessage());
+                return false;
+            }
+        });
         
-        return text;
+        if (!success) {
+            logger.warn("Failed to get text from element '{}' after 3 attempts, returning empty string", elementName);
+            return "";
+        }
+        
+        return result[0] != null ? result[0] : "";
     }
     
     /**
@@ -227,23 +308,72 @@ public abstract class BasePage {
     }
     
     /**
-     * Check if element is visible
+     * Retry operation with specified attempts
+     * @param operation The operation to retry
+     * @param maxAttempts Maximum number of attempts (default: 3)
+     * @param delayBetweenAttempts Delay between attempts in milliseconds (default: 1000)
+     * @return true if operation succeeded, false otherwise
+     */
+    protected boolean retryOperation(java.util.function.Supplier<Boolean> operation, int maxAttempts, long delayBetweenAttempts) {
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                if (operation.get()) {
+                    if (attempt > 1) {
+                        logger.debug("Operation succeeded on attempt {}/{}", attempt, maxAttempts);
+                    }
+                    return true;
+                }
+            } catch (Exception e) {
+                logger.debug("Attempt {}/{} failed: {}", attempt, maxAttempts, e.getMessage());
+            }
+            
+            if (attempt < maxAttempts) {
+                try {
+                    logger.debug("Waiting {}ms before retry attempt {}/{}", delayBetweenAttempts, attempt + 1, maxAttempts);
+                    Thread.sleep(delayBetweenAttempts);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    logger.warn("Sleep interrupted during retry");
+                    break;
+                }
+            }
+        }
+        
+        logger.warn("Operation failed after {} attempts", maxAttempts);
+        return false;
+    }
+    
+    /**
+     * Retry operation with default settings (3 attempts, 1 second delay)
+     * @param operation The operation to retry
+     * @return true if operation succeeded, false otherwise
+     */
+    protected boolean retryOperation(java.util.function.Supplier<Boolean> operation) {
+        return retryOperation(operation, 3, 1000);
+    }
+    
+    /**
+     * Check if element is visible with retry logic
      * @param elementName The element name from JSON
      * @return true if element is visible, false otherwise
      */
     public boolean isElementVisible(String elementName) {
-        try {
-            SelenideElement element = getElement(elementName);
-            boolean isVisible = element.isDisplayed();
-            
-            String description = JsonLocatorHelper.getElementDescription(pageName, elementName);
-            logger.debug("Element '{}' visibility: {}", description, isVisible);
-            
-            return isVisible;
-        } catch (Exception e) {
-            logger.debug("Element '{}' is not visible: {}", elementName, e.getMessage());
-            return false;
-        }
+        logger.debug("Checking visibility of element '{}' with retry", elementName);
+        
+        return retryOperation(() -> {
+            try {
+                SelenideElement element = getElement(elementName);
+                boolean isVisible = element.isDisplayed();
+                
+                String description = JsonLocatorHelper.getElementDescription(pageName, elementName);
+                logger.debug("Element '{}' visibility: {}", description, isVisible);
+                
+                return isVisible;
+            } catch (Exception e) {
+                logger.debug("Element '{}' is not visible: {}", elementName, e.getMessage());
+                return false;
+            }
+        });
     }
     
     /**

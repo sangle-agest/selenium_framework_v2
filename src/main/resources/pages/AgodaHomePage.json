@@ -5,7 +5,7 @@
   "elements": [
     {
       "name": "searchBox",
-      "locator": "xpath=//input[@data-selenium='textInput']",
+      "locator": "xpath=//div[@data-selenium='icon-box-child']//input[@id='textInput']",
       "type": "Textbox",
       "description": "Main search input field for destination"
     },
@@ -53,13 +53,13 @@
     },
     {
       "name": "destinationSuggestions",
-      "locator": "xpath=//ul[@data-selenium='autocomplete-list']",
+      "locator": "xpath=//div[@data-selenium='autocompletePanel']",
       "type": "List",
       "description": "Destination autocomplete suggestions list"
     },
     {
       "name": "firstDestinationSuggestion",
-      "locator": "xpath=//ul[@data-selenium='autocomplete-list']//li[1]",
+      "locator": "xpath=(//div[@id='search-box-autocomplete-id']//ul[@role='listbox']//li[@role='option'])[1]",
       "type": "Button",
       "description": "First destination suggestion"
     },
@@ -74,6 +74,150 @@
       "locator": "xpath=//button[@data-selenium='room-plus-btn']",
       "type": "Button",
       "description": "Increase room count button"
+    },
+    {
+      "name": "calendarButton",
+      "locator": "xpath=//button[@data-element-name='calendar-search']",
+      "type": "Button",
+      "description": "Calendar tab button"
+    },
+    {
+      "name": "calendarDisplay",
+      "locator": "xpath=//div[@id='DatePicker__AccessibleV2']",
+      "type": "Element",
+      "description": "Calendar date picker display"
+    },
+    {
+      "name": "dateCell",
+      "locator": "xpath=//span[@data-selenium-date='{{DATE}}']",
+      "type": "Dynamic",
+      "description": "Calendar date cell with dynamic date"
+    },
+    {
+      "name": "occupancyPanel",
+      "locator": "xpath=//div[@data-selenium='occupancy-selector-panel']",
+      "type": "Element",
+      "description": "Occupancy selector panel"
+    },
+    {
+      "name": "roomMinusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyRooms']//button[@data-selenium='minus']",
+      "type": "Button",
+      "description": "Decrease room count button"
+    },
+    {
+      "name": "roomPlusButtonOccupancy",
+      "locator": "xpath=//div[@data-selenium='occupancyRooms']//button[@data-selenium='plus']",
+      "type": "Button",
+      "description": "Increase room count button in occupancy panel"
+    },
+    {
+      "name": "adultMinusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyAdults']//button[@data-selenium='minus']",
+      "type": "Button",
+      "description": "Decrease adult count button"
+    },
+    {
+      "name": "adultPlusButtonOccupancy",
+      "locator": "xpath=//div[@data-selenium='occupancyAdults']//button[@data-selenium='plus']",
+      "type": "Button",
+      "description": "Increase adult count button in occupancy panel"
+    },
+    {
+      "name": "childrenMinusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyChildren']//button[@data-selenium='minus']",
+      "type": "Button",
+      "description": "Decrease children count button"
+    },
+    {
+      "name": "childrenPlusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyChildren']//button[@data-selenium='plus']",
+      "type": "Button",
+      "description": "Increase children count button"
+    },
+    {
+      "name": "roomCountValue",
+      "locator": "xpath=//div[@data-selenium='desktop-occ-room-value']//p",
+      "type": "Text",
+      "description": "Current room count value"
+    },
+    {
+      "name": "adultCountValue",
+      "locator": "xpath=//div[@data-selenium='desktop-occ-adult-value']//p",
+      "type": "Text",
+      "description": "Current adult count value"
+    },
+    {
+      "name": "childrenCountValue",
+      "locator": "xpath=//div[@data-selenium='desktop-occ-children-value']//p",
+      "type": "Text",
+      "description": "Current children count value"
+    },
+    {
+      "name": "calendarButton",
+      "locator": "id=full-tab-1",
+      "type": "Button",
+      "description": "Calendar button to open date picker"
+    },
+    {
+      "name": "checkInDateSelector",
+      "locator": "xpath=//div[@data-selenium='checkInBox']",
+      "type": "Button",
+      "description": "Check-in date selector in calendar"
+    },
+    {
+      "name": "checkOutDateSelector",
+      "locator": "xpath=//div[@data-selenium='checkOutBox']",
+      "type": "Button",
+      "description": "Check-out date selector in calendar"
+    },
+    {
+      "name": "occupancyPanel",
+      "locator": "xpath=//div[@data-selenium='occupancyBox'] | //div[contains(@class,'occupancy')]",
+      "type": "Button",
+      "description": "Occupancy panel button"
+    },
+    {
+      "name": "roomValue",
+      "locator": "xpath=//div[@data-selenium='desktop-occ-room-value']//p",
+      "type": "Text",
+      "description": "Current room value display"
+    },
+    {
+      "name": "adultValue",
+      "locator": "xpath=//div[@data-selenium='desktop-occ-adult-value']//p",
+      "type": "Text",
+      "description": "Current adult value display"
+    },
+    {
+      "name": "childrenValue",
+      "locator": "xpath=//div[@data-selenium='desktop-occ-children-value']//p",
+      "type": "Text",
+      "description": "Current children value display"
+    },
+    {
+      "name": "roomPlusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyRooms']//button[@data-selenium='plus']",
+      "type": "Button",
+      "description": "Room plus button"
+    },
+    {
+      "name": "adultPlusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyAdults']//button[@data-selenium='plus']",
+      "type": "Button",
+      "description": "Adult plus button"
+    },
+    {
+      "name": "childrenPlusButton",
+      "locator": "xpath=//div[@data-selenium='occupancyChildren']//button[@data-selenium='plus']",
+      "type": "Button",
+      "description": "Children plus button"
+    },
+    {
+      "name": "searchButtonFinal",
+      "locator": "xpath=//button[@data-selenium='searchButton'] | //button[contains(@class,'search')] | //button[contains(text(),'Search')]",
+      "type": "Button",
+      "description": "Final search button"
     }
   ]
 }
