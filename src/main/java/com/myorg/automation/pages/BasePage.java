@@ -157,6 +157,17 @@ public abstract class BasePage {
      * @return Current page instance for method chaining
      */
     protected BasePage typeText(String elementName, String text) {
+        return typeText(elementName, text, false);
+    }
+    
+    /**
+     * Type text into element with option for character-by-character typing
+     * @param elementName The element name from JSON
+     * @param text The text to type
+     * @param useCharacterByCharacter Whether to type character by character (for autocomplete)
+     * @return Current page instance for method chaining
+     */
+    protected BasePage typeText(String elementName, String text, boolean useCharacterByCharacter) {
         if (text == null || text.trim().isEmpty()) {
             logger.warn("Empty text provided for element: {}", elementName);
             return this;
@@ -165,9 +176,14 @@ public abstract class BasePage {
         SelenideElement element = getElement(elementName);
         String description = JsonLocatorHelper.getElementDescription(pageName, elementName);
         
-        logger.info("Typing text '{}' into element: {}", text, description);
+        logger.info("Typing text '{}' into element: {} (character-by-character: {})", text, description, useCharacterByCharacter);
         element.clear();
-        element.setValue(text);
+        
+        if (useCharacterByCharacter) {
+            typeCharacterByCharacter(element, text);
+        } else {
+            element.setValue(text);
+        }
         
         return this;
     }
@@ -202,6 +218,41 @@ public abstract class BasePage {
         // Clear any existing content first
         element.clear();
         
+        // Type character by character to trigger autocomplete
+        typeCharacterByCharacter(element, text);
+        
+        return this;
+    }
+    
+    /**
+     * Type text character by character for autocomplete scenarios
+     * @param elementName The element name from JSON  
+     * @param text The text to type
+     * @return Current page instance for method chaining
+     */
+    protected BasePage typeTextForAutocomplete(String elementName, String text) {
+        return typeText(elementName, text, true);
+    }
+    
+    /**
+     * Type text character by character to trigger autocomplete properly
+     * @param element The element to type into
+     * @param text The text to type
+     */
+    protected void typeCharacterByCharacter(SelenideElement element, String text) {
+        typeCharacterByCharacter(element, text, 100, 1500);
+    }
+    
+    /**
+     * Type text character by character with custom delays
+     * @param element The element to type into
+     * @param text The text to type
+     * @param charDelay Delay between characters in milliseconds
+     * @param finalWait Wait time after complete text in milliseconds
+     */
+    protected void typeCharacterByCharacter(SelenideElement element, String text, int charDelay, int finalWait) {
+        logger.debug("Typing '{}' character by character with {}ms delay", text, charDelay);
+        
         // Type character by character to trigger autocomplete properly
         for (int i = 0; i < text.length(); i++) {
             String character = String.valueOf(text.charAt(i));
@@ -209,20 +260,23 @@ public abstract class BasePage {
             
             // Small delay between characters to trigger search events
             try {
-                Thread.sleep(100);
+                Thread.sleep(charDelay);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                logger.warn("Character typing interrupted");
+                break;
             }
         }
         
         // Wait a bit more for suggestions to appear after complete text
         try {
-            Thread.sleep(1500);
+            Thread.sleep(finalWait);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            logger.warn("Final wait after typing interrupted");
         }
         
-        return this;
+        logger.debug("Completed character-by-character typing for: {}", text);
     }
     
     /**
